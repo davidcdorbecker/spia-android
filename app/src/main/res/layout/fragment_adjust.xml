@@ -1,0 +1,281 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.fiuady.android.fluidproject.MainActivity$PlaceholderFragment">
+
+    <ImageView
+        android:layout_marginTop="20dp"
+        android:layout_width="200dp"
+        android:layout_height="90dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="200sp"
+        android:layout_centerHorizontal="true"
+
+        android:background="@drawable/spya"
+        android:layout_weight="1.62" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/linearLayout">
+
+
+    </LinearLayout>
+
+    <LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:layout_alignParentTop="true"
+    android:layout_toEndOf="@+id/linearLayout">
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginTop="140dp"
+        android:layout_marginLeft="20sp"
+        android:textStyle="bold"
+        android:textSize="15sp"
+        android:text="Modo: " />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginTop="140dp"
+        android:layout_marginLeft="20sp"
+        android:textStyle="italic"
+        android:textSize="15sp"
+        android:text="Automático" />
+
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAlignment="textEnd"
+        android:layout_marginTop="140dp"
+        android:layout_marginLeft="10sp"
+        android:id="@+id/s1"
+        />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textStyle="italic"
+        android:textSize="15sp"
+        android:layout_marginTop="140dp"
+        android:layout_marginLeft="20sp"
+        android:text="Manual" />
+
+</LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/linearLayout">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginTop="170dp"
+            android:layout_marginLeft="20sp"
+            android:textStyle="bold"
+            android:textSize="15sp"
+            android:text="Bomba: " />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginTop="170dp"
+            android:layout_marginLeft="10sp"
+            android:textStyle="italic"
+            android:textSize="15sp"
+            android:text="Desactivada" />
+
+        <Switch
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAlignment="textEnd"
+            android:layout_marginTop="170dp"
+            android:layout_marginLeft="10sp"
+            android:onClick="onClick"
+            android:id="@+id/s2"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textStyle="italic"
+            android:textSize="15sp"
+            android:layout_marginTop="170dp"
+            android:layout_marginLeft="20sp"
+            android:text="Activada" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textStyle="bold"
+        android:textSize="15sp"
+        android:layout_marginTop="220dp"
+        android:layout_marginLeft="20sp"
+        android:text="Riego programado cada:" />
+
+    <Spinner
+        android:layout_width="180dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="250dp"
+        android:layout_marginLeft="20sp"
+        android:textStyle="italic"
+        android:textSize="15sp"
+        android:id="@+id/spinnerEachDay">
+
+    </Spinner>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/textView5"
+            android:layout_width="wrap_content"
+            android:layout_height="22dp"
+            android:textStyle="bold"
+            android:textSize="15sp"
+            android:layout_marginTop="290dp"
+            android:layout_marginLeft="20sp"
+            android:text="Configurar fecha y hora del próximo riego" />
+
+        <ImageButton
+            android:id="@+id/ConfigureDate"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="280dp"
+            android:layout_marginLeft="5sp"
+            android:background="@drawable/configurar"
+            android:layout_weight="1.62" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/newDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textStyle="italic"
+        android:textSize="15sp"
+        android:layout_marginTop="320dp"
+        android:layout_marginLeft="20sp"
+        android:textColor="#008975"
+        tools:text="DD/MM/AA a las NN/NN horas"/>
+
+
+    <LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="wrap_content"
+        android:layout_height="22dp"
+        android:textStyle="bold"
+        android:textSize="15sp"
+        android:layout_marginTop="340dp"
+        android:layout_marginLeft="20sp"
+        android:text="Humedad permisible en la planta 1: " />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="340dp"
+        android:textSize="20dp"
+        android:textStyle="italic"
+        android:textColor="#03a9f4"
+        android:layout_marginLeft="10dp"
+        android:clickable="true"
+        android:id="@+id/Humidity1"
+        android:text="75"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="340dp"
+        android:textSize="20dp"
+        android:textStyle="italic"
+        android:textColor="#03a9f4"
+        android:text="%"/>
+
+</LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/linearLayout">
+
+        <TextView
+            android:id="@+id/textView7"
+            android:layout_width="wrap_content"
+            android:layout_height="22dp"
+            android:textStyle="bold"
+            android:textSize="15sp"
+            android:layout_marginTop="370dp"
+            android:layout_marginLeft="20sp"
+            android:text="Humedad permisible en la planta 2: " />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="370dp"
+            android:layout_marginLeft="10dp"
+            android:textSize="20dp"
+            android:textStyle="italic"
+            android:clickable="true"
+            android:textColor="#03a9f4"
+            android:id="@+id/Humidity2"
+            android:text="75"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="370dp"
+            android:textSize="20dp"
+            android:textStyle="italic"
+            android:textColor="#03a9f4"
+            android:text="%"/>
+
+    </LinearLayout>
+
+    <ImageButton
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="200sp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="420dp"
+        android:id="@+id/btnaccept"
+
+        android:background="@drawable/guardar"
+        android:layout_weight="1.62" />
+
+</RelativeLayout>

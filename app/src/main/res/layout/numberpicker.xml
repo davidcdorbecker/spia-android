@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="match_parent"
+    android:weightSum="1">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Selecciona porcentaje"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="28dp"
+        android:textSize="15sp"
+        />
+
+    <NumberPicker
+        android:layout_marginStart="42dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:id="@+id/numberPickerP"
+        android:layout_weight="0.02"
+        android:descendantFocusability="blocksDescendants">
+
+    </NumberPicker>
+
+    <ImageButton
+        android:layout_width="100dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="25dp"
+        android:textColor="#fff"
+        android:background="@drawable/aceptar"
+        android:layout_marginTop="20dp"
+        android:id="@+id/btnSave"/>
+
+</LinearLayout>
