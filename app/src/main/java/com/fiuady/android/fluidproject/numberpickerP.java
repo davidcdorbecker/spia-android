@@ -13,8 +13,7 @@ import static com.fiuady.android.fluidproject.AdjustFragment.vtempfplant2;
 
 public class numberpickerP extends Activity {
     public void modifyP(int planta, int nplant) {
-        data data = new data(getApplicationContext());
-        data.modifyP(planta, nplant);
+       // data.modifyP(planta, nplant);
     }
 
     NumberPicker numberPicker;

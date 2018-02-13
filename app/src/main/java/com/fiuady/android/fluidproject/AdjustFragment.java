@@ -26,16 +26,20 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import com.fiuady.android.fluidproject.tables.lastDateConfigure;
-import com.fiuady.android.fluidproject.tables.lastHumidity;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 
-import java.io.IOException;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
-import static com.fiuady.android.fluidproject.MainActivity.btSocket;
 import static com.fiuady.android.fluidproject.MainActivity.tempData;
 
 public class AdjustFragment extends Fragment {
@@ -59,16 +63,16 @@ public class AdjustFragment extends Fragment {
     static int min;
     static int each;
     static boolean dateSelected;
-    private data data;
     static boolean vtempfplant1;
     static boolean vtempfplant2;
+    static Date lastDateConfigure;
 
+    static String INFO = "http://spia-services.tk/api/devices/1";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_adjust, container, false);
-        data = new data(getContext());
         dateSelected = false;
         List <String> list = new ArrayList<>();
         list.add("Diario");
@@ -119,10 +123,32 @@ public class AdjustFragment extends Fragment {
         humidity1 = (TextView) view.findViewById(R.id.Humidity1) ;
         humidity2 = (TextView) view.findViewById(R.id.Humidity2);
 
-        lastDateConfigure dateConfigure = data.getLastConfigureData();
-        String lastDateConfigure = dateConfigure.getStringDay() + "/" + dateConfigure.getStringMonth() + "/" + dateConfigure.getStringYear() + " a las " + dateConfigure.getStringHour() + ":" + dateConfigure.getStringMinute() + " horas cada " + dateConfigure.getEach() + " días";
+      JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, INFO, new Response.Listener<JSONObject>() {
+          @Override
+          public void onResponse(JSONObject response) {
+              try {
+                  humidity1.setText(String.valueOf(response.getInt("max_humidity_1")));
+                  humidity2.setText(String.valueOf(response.getInt("max_humidity_2")));
+              } catch (JSONException e) {
+                  e.printStackTrace();
+              }
+          }
+      }, new Response.ErrorListener() {
+          @Override
+          public void onErrorResponse(VolleyError error) {
+            Toast.makeText(getContext(), "No se pudo acceder al servidor", Toast.LENGTH_SHORT).show();
+          }
+      });
+        MySingleton.getInstance(getContext()).addToRequestque(jsonObjectRequest);
 
-        newDate.setText(lastDateConfigure);
+
+
+        //lastDateConfigure.setTime();
+
+        //lastDateConfigure dateConfigure = data.getLastConfigureData();
+       // String lastDateConfigure = dateConfigure.getStringDay() + "/" + dateConfigure.getStringMonth() + "/" + dateConfigure.getStringYear() + " a las " + dateConfigure.getStringHour() + ":" + dateConfigure.getStringMinute() + " horas cada " + dateConfigure.getEach() + " días";
+
+       // newDate.setText(lastDateConfigure);
 
         btnaccept = (ImageButton)view.findViewById(R.id.btnaccept);
         btnaccept.setOnClickListener(new View.OnClickListener() {
@@ -363,18 +389,18 @@ public class AdjustFragment extends Fragment {
         vtempfplant1 = false;
         vtempfplant2 = false;
 
-        lastHumidity lastHumidity = data.getLastHumidity();
-        final String planta1 = String.valueOf(lastHumidity.getPlant1());
-        final String planta2 = String.valueOf(lastHumidity.getPlant2());
+        //lastHumidity lastHumidity = data.getLastHumidity();
+        //final String planta1 = String.valueOf(lastHumidity.getPlant1());
+       // final String planta2 = String.valueOf(lastHumidity.getPlant2());
 
-        humidity1.setText(planta1);
-        humidity2.setText(planta2);
+        //humidity1.setText(planta1);
+        //humidity2.setText(planta2);
 
         humidity1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getContext(), numberpickerP.class);
-                intent.putExtra("planta", Integer.valueOf(planta1));
+               // intent.putExtra("planta", Integer.valueOf(planta1));
                 intent.putExtra("nplant", 1);
 
                 startActivity(intent);
@@ -385,7 +411,7 @@ public class AdjustFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getContext(), numberpickerP.class);
-                intent.putExtra("planta", Integer.valueOf(planta2));
+                //intent.putExtra("planta", Integer.valueOf(planta2));
                 intent.putExtra("nplant", 2);
 
                 startActivity(intent);
@@ -424,13 +450,13 @@ public class AdjustFragment extends Fragment {
 
     public void refresh() {
 
-        lastHumidity lastHumidity = data.getLastHumidity();
+        //lastHumidity lastHumidity = data.getLastHumidity();
 
-        final String planta1 = String.valueOf(lastHumidity.getPlant1());
-        final String planta2 = String.valueOf(lastHumidity.getPlant2());
+        //final String planta1 = String.valueOf(lastHumidity.getPlant1());
+        //final String planta2 = String.valueOf(lastHumidity.getPlant2());
 
-        humidity1.setText(planta1);
-        humidity2.setText(planta2);
+        //humidity1.setText(planta1);
+        //humidity2.setText(planta2);
     }
 
     private void msg(String s)
@@ -447,7 +473,7 @@ public class AdjustFragment extends Fragment {
     }
 
     private void changePlant1() {
-        if (btSocket!=null)
+        /*if (btSocket!=null)
         {
 
             lastHumidity lastHumidity = data.getLastHumidity();
@@ -461,11 +487,11 @@ public class AdjustFragment extends Fragment {
             {
                 msg("¡Revisar conexión Bluetooth!");
             }
-        }
+        }*/
     }
 
     private void changePlant2() {
-        if (btSocket!=null)
+        /*if (btSocket!=null)
         {
 
             lastHumidity lastHumidity = data.getLastHumidity();
@@ -479,12 +505,12 @@ public class AdjustFragment extends Fragment {
             {
                 msg("¡Revisar conexión Bluetooth!");
             }
-        }
+        }*/
     }
 
     private void pumpOn()
     {
-        if (btSocket!=null)
+        /*if (btSocket!=null)
         {
             try
             {
@@ -494,13 +520,13 @@ public class AdjustFragment extends Fragment {
             {
                 msg("¡Revisar conexión Bluetooth!");
             }
-        }
+        }*/
     }
 
 
     private void pumpOff()
     {
-        if (btSocket!=null)
+        /*if (btSocket!=null)
         {
             try
             {
@@ -510,11 +536,11 @@ public class AdjustFragment extends Fragment {
             {
                 msg("Error");
             }
-        }
+        }*/
     }
 
     private void automaticModeOff () {
-        if (btSocket!=null)
+        /*if (btSocket!=null)
         {
             try
             {
@@ -524,11 +550,11 @@ public class AdjustFragment extends Fragment {
             {
                 msg("Error");
             }
-        }
+        }*/
     }
 
     private void automaticModeOn () {
-        if (btSocket!=null)
+        /*if (btSocket!=null)
         {
             try
             {
@@ -538,7 +564,7 @@ public class AdjustFragment extends Fragment {
             {
                 msg("Error");
             }
-        }
+        }*/
     }
 
     private void configurePump (int each) {
@@ -580,7 +606,7 @@ public class AdjustFragment extends Fragment {
 
         String date = "AT" + tempy + tempmonth + tempday + temphr + tempmin + each;
 
-        if (btSocket!=null)
+        /*if (btSocket!=null)
         {
             try
             {
@@ -590,17 +616,17 @@ public class AdjustFragment extends Fragment {
             {
                 msg("Error");
             }
-        }
+        }*/
 
         UpdateLastDateConfigure(dd, mm, yy, hr, min, each);
     }
 
     public void UpdateLastDateConfigure (int day, int month, int year, int hour, int minute, int each) {
-            data.updateLastDateConfigure(day, month, year, hour, minute, each);
+            //data.updateLastDateConfigure(day, month, year, hour, minute, each);
     }
 
     public void updateLastPumpOn (String day, String month, String year, String hour, String minute) {
-        data.updateLastPumpOn(day, month, year, hour, minute);
+       // data.updateLastPumpOn(day, month, year, hour, minute);
     }
 
     public static class SelectDateFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {

@@ -1,10 +1,6 @@
 package com.fiuady.android.fluidproject;
 
 import android.app.ProgressDialog;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -18,12 +14,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -40,14 +30,9 @@ public class MainActivity extends AppCompatActivity {
     /**
      * The {@link ViewPager} that will host the section contents.
      */
-    String address = null;
-    public static BluetoothSocket btSocket = null;
+
     static String tempData;
     private ViewPager mViewPager;
-    BluetoothAdapter myBluetooth = null;
-    private boolean isBtConnected = false;
-    static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-    private data data;
 
 
     private ProgressDialog progress;
@@ -58,11 +43,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        data = new data(getApplicationContext());
-        Helper.backupDatabaseFile(getApplicationContext());
-
-        address = "98:D3:31:50:31:4A";
-        new ConnectBT().execute(); //Call the class to connect
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -85,11 +65,6 @@ public class MainActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
-    }
-
-    private void msg(String s)
-    {
-        Toast.makeText(getApplicationContext(),s,Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -182,110 +157,6 @@ public class MainActivity extends AppCompatActivity {
                     return "Información";
             }
             return null;
-        }
-    }
-
-    private class ConnectBT extends AsyncTask<Void, Void, Void>  // UI thread
-    {
-        private boolean ConnectSuccess = true;
-
-        @Override
-        protected void onPreExecute()
-        {
-            progress = ProgressDialog.show(MainActivity.this, "Conectando...", "Buscando dispositivo...");
-        }
-
-        @Override
-        protected Void doInBackground(Void... devices)
-        {
-            try
-            {
-                if (btSocket == null || !isBtConnected)
-                {
-                    myBluetooth = BluetoothAdapter.getDefaultAdapter();
-                    BluetoothDevice dispositivo = myBluetooth.getRemoteDevice(address);//conectamos al dispositivo y chequeamos si esta disponible
-                    btSocket = dispositivo.createInsecureRfcommSocketToServiceRecord(myUUID);
-                    BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
-                    btSocket.connect();
-                }
-            }
-            catch (IOException e)
-            {
-                ConnectSuccess = false;
-            }
-            return null;
-        }
-        @Override
-        protected void onPostExecute(Void result)
-        {
-            super.onPostExecute(result);
-
-            if (!ConnectSuccess)
-            {
-                msg("Conexión Fallida");
-                finish();
-            }
-            else
-            {
-                msg("Conectado");
-                isBtConnected = true;
-                try {
-                    BufferedReader br = new BufferedReader(new InputStreamReader(btSocket.getInputStream()));
-                    new BtBackgroundTask().execute(br);
-                }
-                catch (Exception e) {
-
-                }
-            }
-            progress.dismiss();
-        }
-
-        private void msg(String s)
-        {
-            Toast.makeText(getApplicationContext(),s,Toast.LENGTH_LONG).show();
-        }
-    }
-
-    private class BtBackgroundTask extends AsyncTask<BufferedReader, String, Void> {
-        @Override
-        protected Void doInBackground(BufferedReader... params) {
-            try {
-                while (!isCancelled()) {
-                    publishProgress(params[0].readLine());
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-
-
-        @Override
-        protected void onProgressUpdate(String... progress) {
-            appendMessageText(progress[0]);
-
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-        }
-    }
-
-    private void appendMessageText(String text) {
-        tempData = text;
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        try {
-            btSocket.close();
-        }
-        catch (Exception e) {
-
         }
     }
 
