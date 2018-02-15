@@ -34,13 +34,9 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-
-import static com.fiuady.android.fluidproject.MainActivity.tempData;
 
 public class AdjustFragment extends Fragment {
 
@@ -62,12 +58,17 @@ public class AdjustFragment extends Fragment {
     static int hr;
     static int min;
     static int each;
+    static String formatdate;
+    static int hum1;
+    static int hum2;
     static boolean dateSelected;
     static boolean vtempfplant1;
     static boolean vtempfplant2;
-    static Date lastDateConfigure;
 
-    static String INFO = "http://spia-services.tk/api/devices/1";
+    static String DEVICE_INFO = "http://spia-services.tk/api/devices/1";
+    static String PLANT1_INFO = "http://spia-services.tk/api/plants/1";
+    static String PLANT2_INFO = "http://spia-services.tk/api/plants/2";
+    static String PUMP_ON = "http://spia-services.tk/api/devices/1/pump-on";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -123,101 +124,83 @@ public class AdjustFragment extends Fragment {
         humidity1 = (TextView) view.findViewById(R.id.Humidity1) ;
         humidity2 = (TextView) view.findViewById(R.id.Humidity2);
 
-      JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, INFO, new Response.Listener<JSONObject>() {
-          @Override
-          public void onResponse(JSONObject response) {
-              try {
-                  humidity1.setText(String.valueOf(response.getInt("max_humidity_1")));
-                  humidity2.setText(String.valueOf(response.getInt("max_humidity_2")));
-              } catch (JSONException e) {
-                  e.printStackTrace();
-              }
-          }
-      }, new Response.ErrorListener() {
-          @Override
-          public void onErrorResponse(VolleyError error) {
-            Toast.makeText(getContext(), "No se pudo acceder al servidor", Toast.LENGTH_SHORT).show();
-          }
-      });
-        MySingleton.getInstance(getContext()).addToRequestque(jsonObjectRequest);
-
-
-
-        //lastDateConfigure.setTime();
-
-        //lastDateConfigure dateConfigure = data.getLastConfigureData();
-       // String lastDateConfigure = dateConfigure.getStringDay() + "/" + dateConfigure.getStringMonth() + "/" + dateConfigure.getStringYear() + " a las " + dateConfigure.getStringHour() + ":" + dateConfigure.getStringMinute() + " horas cada " + dateConfigure.getEach() + " días";
-
-       // newDate.setText(lastDateConfigure);
+        updateData(true);
 
         btnaccept = (ImageButton)view.findViewById(R.id.btnaccept);
         btnaccept.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder builder1 = new AlertDialog.Builder(view.getContext());
-                final View view1 = getLayoutInflater(null).inflate(R.layout.pinsecurity, null);
+                if (!manualMode) {
+                    if (dateSelected) {
+                        AlertDialog.Builder builder1 = new AlertDialog.Builder(view.getContext());
+                        final View view1 = getLayoutInflater(null).inflate(R.layout.pinsecurity, null);
 
-                builder1.setView(view1);
-                final AlertDialog dialog = builder1.create();
+                        builder1.setView(view1);
+                        final AlertDialog dialog = builder1.create();
 
-                final ImageButton btnok = (ImageButton) view1.findViewById(R.id.btnok);
-                final ImageButton btncancel = (ImageButton) view1.findViewById(R.id.btncancel);
-                final EditText password = (EditText) view1.findViewById(R.id.pasword);
+                        final ImageButton btnok = (ImageButton) view1.findViewById(R.id.btnok);
+                        final ImageButton btncancel = (ImageButton) view1.findViewById(R.id.btncancel);
+                        final EditText password = (EditText) view1.findViewById(R.id.pasword);
 
-                btnok.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
+                        btnok.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
 
-                        if (password.getText().toString().equals("1234")) {
-                            each = -1;
-                            switch (spinner.getSelectedItemPosition()) {
-                                case 0: {
-                                    each = 1;
-                                    break;
-                                }
+                                if (password.getText().toString().equals("1234")) {
+                                    each = -1;
+                                    switch (spinner.getSelectedItemPosition()) {
+                                        case 0: {
+                                            each = 1;
+                                            break;
+                                        }
 
-                                case 1: {
-                                    each = 2;
-                                    break;
-                                }
+                                        case 1: {
+                                            each = 2;
+                                            break;
+                                        }
 
-                                case 2: {
-                                    each = 3;
-                                    break;
+                                        case 2: {
+                                            each = 3;
+                                            break;
+                                        }
+                                    }
+                                    configurePump(each);
+                                    Toast.makeText(getContext(), "Bomba configurada correctamente", Toast.LENGTH_SHORT).show();
+                                    dialog.dismiss();
+                                } else {
+                                    Toast.makeText(view1.getContext(), "¡PIN incorrecto!", Toast.LENGTH_SHORT).show();
+                                    dialog.dismiss();
                                 }
                             }
-                            configurePump(each);
-                            Toast.makeText(getContext(), "Bomba configurada correctamente", Toast.LENGTH_SHORT).show();
-                            dialog.dismiss();
-                        } else {
-                            Toast.makeText(view1.getContext(), "¡PIN incorrecto!", Toast.LENGTH_SHORT).show();
-                            dialog.dismiss();
-                        }
-                    }
-                });
+                        });
 
-                btncancel.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        dialog.dismiss();
-                    }
-                });
+                        btncancel.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                dialog.dismiss();
+                            }
+                        });
 
-                dialog.show();
-                doKeepDialog(dialog);
+                        dialog.show();
+                        doKeepDialog(dialog);
+                    }
+                    else {
+                        Toast.makeText(getContext(), "Selecciona una fecha para reconfigurar el sistema", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                else {
+                    Toast.makeText(getContext(), "El modo manual está activo, cambiarlo a modo automático para reconfigurar el sistema", Toast.LENGTH_LONG).show();
+                }
             }
         });
 
-
-        manualMode = false;
-
         sw2 = (Switch) view.findViewById(R.id.s2);
-        sw2.setEnabled(false);
 
         sw2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                pumpOperation();
             }
         });
 
@@ -291,7 +274,7 @@ public class AdjustFragment extends Fragment {
         sw2.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
+               /* if (isChecked) {
 
                     String temporal = tempData;
                     int[] index;
@@ -371,7 +354,7 @@ public class AdjustFragment extends Fragment {
 
                 else {
                     pumpOff();
-                }
+                }*/
             }
         });
 
@@ -383,8 +366,6 @@ public class AdjustFragment extends Fragment {
                 newFragment.show(getFragmentManager(), "DatePicker");
             }
         });
-
-        ///*****************Checar posible bug aqui************************/////
 
         vtempfplant1 = false;
         vtempfplant2 = false;
@@ -400,10 +381,11 @@ public class AdjustFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getContext(), numberpickerP.class);
-               // intent.putExtra("planta", Integer.valueOf(planta1));
+                intent.putExtra("planta", Integer.valueOf(humidity1.getText().toString()));
                 intent.putExtra("nplant", 1);
 
                 startActivity(intent);
+
             }
         });
 
@@ -411,7 +393,7 @@ public class AdjustFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getContext(), numberpickerP.class);
-                //intent.putExtra("planta", Integer.valueOf(planta2));
+                intent.putExtra("planta", Integer.valueOf(humidity2.getText().toString()));
                 intent.putExtra("nplant", 2);
 
                 startActivity(intent);
@@ -422,46 +404,59 @@ public class AdjustFragment extends Fragment {
 
         //changePlant1();
         //changePlant2();
-
         return view;
+    }
+
+    private void updateData(final boolean server) {
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, DEVICE_INFO, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    if (server) {
+                        hum1 = response.getInt("max_humidity_1");
+                        hum2 = response.getInt("max_humidity_2");
+                        formatdate = response.getString("last_irrigation");
+                        each = response.getInt("hours_to_repeat")/24;
+
+                        if (response.getString("automatic_mode").equals("off")) {
+                            manualMode = true;
+                            sw2.setEnabled(true);
+                            sw1.setChecked(true);
+                        }
+                        else {
+                            manualMode = false;
+                            sw2.setEnabled(false);
+                            sw1.setChecked(false);
+                        }
+
+                    }
+
+                    humidity1.setText(String.valueOf(hum1));
+                    humidity2.setText(String.valueOf(hum2));
+                    spinner.setSelection(each-1);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getContext(), "No se pudo acceder al servidor", Toast.LENGTH_SHORT).show();
+            }
+        });
+        MySingleton.getInstance(getContext()).addToRequestque(jsonObjectRequest);
     }
 
     @Override
     public void onResume() {
         super.onResume();
 
-        if (vtempfplant1) {
-            changePlant1();
-            vtempfplant1 = false;
-        }
-
-        if (vtempfplant2) {
-            changePlant2();
-            vtempfplant2 = false;
-        }
-
-        refresh();
+       updateData(false);
     }
 
     public static void updateLabel() {
         label = labelDate + each + " días";
         newDate.setText(label);
-    }
-
-    public void refresh() {
-
-        //lastHumidity lastHumidity = data.getLastHumidity();
-
-        //final String planta1 = String.valueOf(lastHumidity.getPlant1());
-        //final String planta2 = String.valueOf(lastHumidity.getPlant2());
-
-        //humidity1.setText(planta1);
-        //humidity2.setText(planta2);
-    }
-
-    private void msg(String s)
-    {
-        Toast.makeText(getView().getContext(),s,Toast.LENGTH_LONG).show();
     }
 
     private  void doKeepDialog(Dialog dialog){
@@ -472,55 +467,34 @@ public class AdjustFragment extends Fragment {
         dialog.getWindow().setAttributes(lp);
     }
 
-    private void changePlant1() {
-        /*if (btSocket!=null)
-        {
-
-            lastHumidity lastHumidity = data.getLastHumidity();
-            int p1 = lastHumidity.getPlant1();
-            String s = "HUM1CHANGE" + p1;
-            try
-            {
-                btSocket.getOutputStream().write(s.getBytes());
-            }
-            catch (IOException e)
-            {
-                msg("¡Revisar conexión Bluetooth!");
-            }
-        }*/
-    }
-
-    private void changePlant2() {
-        /*if (btSocket!=null)
-        {
-
-            lastHumidity lastHumidity = data.getLastHumidity();
-            int p2 = lastHumidity.getPlant2();
-            String s = "HUM2CHANGE" + p2;
-            try
-            {
-                btSocket.getOutputStream().write(s.getBytes());
-            }
-            catch (IOException e)
-            {
-                msg("¡Revisar conexión Bluetooth!");
-            }
-        }*/
-    }
-
-    private void pumpOn()
+    private void pumpOperation()
     {
-        /*if (btSocket!=null)
-        {
-            try
-            {
-                btSocket.getOutputStream().write("1".toString().getBytes());
-            }
-            catch (IOException e)
-            {
-                msg("¡Revisar conexión Bluetooth!");
-            }
-        }*/
+        //Prender la bomba
+
+        if (sw2.isChecked()) {
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, PUMP_ON, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    try {
+                        if (response.getString("success").equals("Pump on sent to Arduino")) {
+                            Toast.makeText(getContext(), "La bomba esta activa", Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(getContext(), "Error de conexión", Toast.LENGTH_SHORT).show();
+                }
+            });
+            MySingleton.getInstance(getContext()).addToRequestque(jsonObjectRequest);
+        }
+
+        else {
+            Toast.makeText(getContext(), "La bomba se ha desactivado", Toast.LENGTH_SHORT).show();
+        }
     }
 
 
@@ -568,61 +542,29 @@ public class AdjustFragment extends Fragment {
     }
 
     private void configurePump (int each) {
-
-        String tempy = String.valueOf(yy);
-        tempy = tempy.substring(2, 4);
-
-        String temphr;
-        if (hr < 10) {
-            temphr = "0" + String.valueOf(hr);
-        }
-        else {
-            temphr = String.valueOf(hr);
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("next_irrigation", formatdate);
+            jsonObject.put("hours_to_repeat", 24*each);
+            jsonObject.put("automatic_mode", "on");
+            jsonObject.put("source", "app");
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
 
-        String tempmin;
-        if (min < 10) {
-            tempmin = "0" + String.valueOf(min);
-        }
-        else {
-            tempmin = String.valueOf(min);
-        }
-
-        String tempmonth;
-        if (mm < 10) {
-            tempmonth = "0" + String.valueOf(mm);
-        }
-        else {
-            tempmonth = String.valueOf(mm);
-        }
-
-        String tempday;
-        if (dd < 10) {
-            tempday = "0" + String.valueOf(dd);
-        }
-        else {
-            tempday = String.valueOf(dd);
-        }
-
-        String date = "AT" + tempy + tempmonth + tempday + temphr + tempmin + each;
-
-        /*if (btSocket!=null)
-        {
-            try
-            {
-                btSocket.getOutputStream().write(date.getBytes());
+        //Configuración del dispositivo
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.PATCH, DEVICE_INFO, jsonObject, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                Toast.makeText(getContext(), "La bomba se configuró correctamente", Toast.LENGTH_SHORT).show();
             }
-            catch (IOException e)
-            {
-                msg("Error");
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getContext(), "Error en la conexión", Toast.LENGTH_SHORT).show();
             }
-        }*/
-
-        UpdateLastDateConfigure(dd, mm, yy, hr, min, each);
-    }
-
-    public void UpdateLastDateConfigure (int day, int month, int year, int hour, int minute, int each) {
-            //data.updateLastDateConfigure(day, month, year, hour, minute, each);
+        });
+        MySingleton.getInstance(getContext()).addToRequestque(jsonObjectRequest);
     }
 
     public void updateLastPumpOn (String day, String month, String year, String hour, String minute) {
@@ -709,6 +651,7 @@ public class AdjustFragment extends Fragment {
 
             labelDate = tday+"/"+tmonth+"/"+yy+" a las "+thour+":"+tminute+" horas cada ";
             dateSelected = true;
+            formatdate = yy + "-" + tmonth + "-" + tday + " " + thour + ":" + tminute + ":" + "00";
             updateLabel();
         }
     }

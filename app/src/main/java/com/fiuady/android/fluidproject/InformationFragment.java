@@ -23,9 +23,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import static com.fiuady.android.fluidproject.AdjustFragment.INFO;
+import static com.fiuady.android.fluidproject.AdjustFragment.DEVICE_INFO;
+import static com.fiuady.android.fluidproject.AdjustFragment.PLANT1_INFO;
+import static com.fiuady.android.fluidproject.AdjustFragment.PLANT2_INFO;
 import static com.fiuady.android.fluidproject.AdjustFragment.manualMode;
-import static com.fiuady.android.fluidproject.MainActivity.tempData;
 
 public class InformationFragment extends Fragment {
 
@@ -54,13 +55,71 @@ public class InformationFragment extends Fragment {
         tempText = (TextView) view.findViewById(R.id.tempText) ;
         plant1 = (TextView) view.findViewById(R.id.plant1) ;
         plant2 = (TextView) view.findViewById(R.id.plant2) ;
+        updateData();
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, INFO, new Response.Listener<JSONObject>() {
+        btnRefresh = (ImageButton) view.findViewById(R.id.btnRefresh);
+        btnRefresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                /*String temporal = tempData;
+                int[] index;
+                index = new int[2];
+                index[0] = temporal.indexOf("/");
+                index[1] = temporal.indexOf("|");
+                String label = temporal.substring(0, index[0]);
+                tempText.setText(label);
+                label = temporal.substring(index[0]+1, index[1]);
+                plant1.setText(label);
+                label = temporal.substring(index[1]+1);
+                plant2.setText(label);*/
+
+              //  lastDateConfigure dateConfigure = data.getLastConfigureData();
+              //  String ndate = dateConfigure.getStringDay() + "/" + dateConfigure.getStringMonth() + "/" + dateConfigure.getStringYear() + " a las " + dateConfigure.getStringHour() + ":" + dateConfigure.getStringMinute() + " horas";
+
+               // lastPumpOn pumpOn = data.getLastPumpOn();
+               // String ldate = pumpOn.getStringDay() + "/" + pumpOn.getStringMonth() + "/" + pumpOn.getStringYear() + " a las " + pumpOn.getStringHour() + ":" + pumpOn.getStringMinute() + " horas";
+
+                /*if (manualMode) {
+              //      ndate = "No asignado";
+                }
+
+               // txtLastDate.setText(ldate);
+              //  txtNextDate.setText(ndate);*/
+                updateData();
+            }
+        });
+        return view;
+    }
+
+    private String formatDate(String date) {
+        DateFormat pattern = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String response = "(...)";
+        try {
+            Date fDate = pattern.parse(date);
+            response =  pattern.format(fDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return response;
+    }
+
+    private void updateData() {
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, DEVICE_INFO, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
                     txtLastDate.setText(formatDate(response.getString("last_irrigation")));
-                    txtNextDate.setText(formatDate(response.getString("next_irrigation")));
+                    tempText.setText(response.getString("temperature"));
+
+                    if (manualMode) {
+                        String string = "No definido, modo manual activo";
+                        txtNextDate.setText(string);
+                    }
+                    else {
+                        txtNextDate.setText(formatDate(response.getString("next_irrigation")));
+                    }
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -73,50 +132,39 @@ public class InformationFragment extends Fragment {
         });
         MySingleton.getInstance(getContext()).addToRequestque(jsonObjectRequest);
 
-        btnRefresh = (ImageButton) view.findViewById(R.id.btnRefresh);
-        btnRefresh.setOnClickListener(new View.OnClickListener() {
+        jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, PLANT1_INFO, new Response.Listener<JSONObject>() {
             @Override
-            public void onClick(View v) {
-                String temporal = tempData;
-                int[] index;
-                index = new int[2];
-                index[0] = temporal.indexOf("/");
-                index[1] = temporal.indexOf("|");
-                String label = temporal.substring(0, index[0]);
-                tempText.setText(label);
-                label = temporal.substring(index[0]+1, index[1]);
-                plant1.setText(label);
-                label = temporal.substring(index[1]+1);
-                plant2.setText(label);
-
-              //  lastDateConfigure dateConfigure = data.getLastConfigureData();
-              //  String ndate = dateConfigure.getStringDay() + "/" + dateConfigure.getStringMonth() + "/" + dateConfigure.getStringYear() + " a las " + dateConfigure.getStringHour() + ":" + dateConfigure.getStringMinute() + " horas";
-
-               // lastPumpOn pumpOn = data.getLastPumpOn();
-               // String ldate = pumpOn.getStringDay() + "/" + pumpOn.getStringMonth() + "/" + pumpOn.getStringYear() + " a las " + pumpOn.getStringHour() + ":" + pumpOn.getStringMinute() + " horas";
-
-                if (manualMode) {
-              //      ndate = "No asignado";
+            public void onResponse(JSONObject response) {
+                try {
+                    plant1.setText(response.getString("humidity"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
 
-               // txtLastDate.setText(ldate);
-              //  txtNextDate.setText(ndate);
             }
         });
-        return view;
-    }
+        MySingleton.getInstance(getContext()).addToRequestque(jsonObjectRequest);
 
-    private String formatDate(String date) {
-        DateFormat pattern = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String r = "(...)";
-        try {
-            Date fDate = pattern.parse(date);
-            r =  pattern.format(fDate);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, PLANT2_INFO, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    plant2.setText(response.getString("humidity"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
 
-        return r;
+            }
+        });
+        MySingleton.getInstance(getContext()).addToRequestque(jsonObjectRequest);
     }
 
     private  void updateDateConfigure () {

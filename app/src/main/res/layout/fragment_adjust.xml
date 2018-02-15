@@ -213,7 +213,7 @@
         android:layout_marginLeft="10dp"
         android:clickable="true"
         android:id="@+id/Humidity1"
-        android:text="75"/>
+        android:text="..."/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -253,7 +253,7 @@
             android:clickable="true"
             android:textColor="#03a9f4"
             android:id="@+id/Humidity2"
-            android:text="75"/>
+            android:text="..."/>
 
         <TextView
             android:layout_width="wrap_content"

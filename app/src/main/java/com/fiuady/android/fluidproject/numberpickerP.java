@@ -7,14 +7,23 @@ import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.NumberPicker;
+import android.widget.Toast;
 
-import static com.fiuady.android.fluidproject.AdjustFragment.vtempfplant1;
-import static com.fiuady.android.fluidproject.AdjustFragment.vtempfplant2;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import static com.fiuady.android.fluidproject.AdjustFragment.PLANT1_INFO;
+import static com.fiuady.android.fluidproject.AdjustFragment.PLANT2_INFO;
+
+import static com.fiuady.android.fluidproject.AdjustFragment.hum1;
+import static com.fiuady.android.fluidproject.AdjustFragment.hum2;
 
 public class numberpickerP extends Activity {
-    public void modifyP(int planta, int nplant) {
-       // data.modifyP(planta, nplant);
-    }
 
     NumberPicker numberPicker;
     ImageButton btnaccept;
@@ -45,18 +54,64 @@ public class numberpickerP extends Activity {
             @Override
             public void onClick(View v) {
 
-                modifyP(numberPicker.getValue(), nplant);
-
-                if (nplant == 1) {
-                    vtempfplant1 = true;
-                }
-
-                if (nplant == 2) {
-                    vtempfplant2 = true;
-                }
+        modifyP(numberPicker.getValue(), nplant);
 
                 finish();
             }
         });
+    }
+
+    private void modifyP(int value, int plant) {
+
+        String key = "max_humidity";
+
+        if (plant == 1) {
+
+            JSONObject jsonObject = new JSONObject();
+            try {
+                jsonObject.put(key, String.valueOf(value));
+                jsonObject.put("source", "app");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.PATCH, PLANT1_INFO, jsonObject, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    Toast.makeText(getApplicationContext(), "La humedad permisible se ha modificado", Toast.LENGTH_SHORT).show();
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(getApplicationContext(), "Error en la conexión", Toast.LENGTH_SHORT).show();
+                }
+            });
+            MySingleton.getInstance(getApplicationContext()).addToRequestque(jsonObjectRequest);
+            hum1 = value;
+        }
+
+        if (plant == 2) {
+            JSONObject jsonObject = new JSONObject();
+            try {
+                jsonObject.put(key, String.valueOf(value));
+                jsonObject.put("source", "app");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.PATCH, PLANT2_INFO, jsonObject, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    Toast.makeText(getApplicationContext(), "La humedad permisible se ha modificado", Toast.LENGTH_SHORT).show();
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(getApplicationContext(), "Error en la conexión", Toast.LENGTH_SHORT).show();
+                }
+            });
+            MySingleton.getInstance(getApplicationContext()).addToRequestque(jsonObjectRequest);
+            hum2 = value;
+        }
     }
 }
